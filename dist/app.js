@@ -107,6 +107,7 @@ let activeFrame=null, runNumber=0, logCount=0, runtimePromise=null, loadingTimer
 function status(text,state='') { $('status').textContent=text; $('status').dataset.state=state; }
 function clearConsole() {logCount=0;$('log-count').textContent='0';$('console').replaceChildren();}
 function log(kind, values) {
+ if (kind === 'error') $('console-panel').open = true;
  if (logCount >= 500) return;
  const row=document.createElement('div');row.className='log '+kind;
  const prefix=document.createElement('span');prefix.className='prefix';prefix.textContent=kind==='result'?'⇒':kind==='error'?'!':'›';

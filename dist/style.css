@@ -29,3 +29,21 @@ main{padding-top:14px}
  header .actions{grid-column:1;grid-row:2;justify-self:end}
  header .tools{grid-row:3}
 }
+
+/* HTML / CSS above ClojureScript / Result. Console belongs to Result. */
+.workspace{grid-template-areas:"html css" "cljs result";grid-template-rows:minmax(220px,1fr) minmax(340px,2fr)}
+.html-panel{grid-area:html}.css-panel{grid-area:css}.code-panel{grid-area:cljs}.preview-panel{grid-area:result}
+.console-panel{display:block;flex:0 0 auto;height:auto;min-height:0;border:0;border-top:1px solid var(--edge);border-radius:0;background:var(--panel)}
+.console-panel summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:39px;padding:8px 16px;cursor:pointer;background:#1c212a;list-style:none;font-weight:550}
+.console-panel summary::-webkit-details-marker{display:none}
+.console-panel summary:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.console-label{display:flex;align-items:center;gap:9px}
+.console-chevron{color:var(--muted);font-size:17px;line-height:1;transform:rotate(180deg)}
+.console-panel[open] .console-chevron{transform:rotate(0deg)}
+.console-panel:not([open]) .console-body{display:none}
+.console-body{height:150px;display:flex;flex-direction:column;min-height:0;border-top:1px solid var(--edge)}
+.console-tools{display:flex;justify-content:flex-end;padding:3px 10px;flex-shrink:0}
+.console-tools button{padding:2px 6px;font-size:12px;background:transparent;border:0;color:#a8b6ca}
+.console-tools button:hover{color:var(--text);background:#303a47}
+.console-body #console{min-height:0;padding-top:0}
+@media(max-width:640px){.html-panel,.css-panel{height:240px}.code-panel{height:390px}.preview-panel{height:480px}.console-panel{height:auto}}

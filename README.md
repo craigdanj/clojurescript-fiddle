@@ -5,7 +5,9 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 ## Features
 
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
+- HTML and CSS editors across the top; ClojureScript and Result below.
 - Live DOM preview in a sandboxed iframe.
+- Collapsible console docked at the bottom of Result. It starts collapsed, retains output while hidden, and opens automatically on errors.
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
 - Each Run creates a fresh interpreter, document, and state.
 - Stop discards the preview and its asynchronous callbacks. Clear clears the console only.
