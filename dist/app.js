@@ -170,3 +170,103 @@ $('help').addEventListener('click',()=>toggleHelp($('guide').hidden));$('close-g
 document.addEventListener('keydown',e=>{if(!e.defaultPrevented&&(e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});
 for(const key of Object.keys(editors))editors[key].setValue(examples.counter[key]);
 run();
+
+// Shared desktop dividers and individual height handles on stacked screens.
+(() => {
+ const workspace = $('workspace');
+ const panels = [...workspace.querySelectorAll(':scope > .panel')];
+ const narrow = window.matchMedia('(max-width: 640px)');
+ const ratios = {x:0.5,y:1/3};
+ let drag = null, refreshFrame = null;
+ const clamp = (value,min,max) => Math.max(min,Math.min(max,value));
+ function bounds(axis) {
+  const size = (axis === 'x' ? workspace.clientWidth : workspace.clientHeight) - 12;
+  const firstMin = axis === 'x' ? 200 : 160;
+  const secondMin = axis === 'x' ? 200 : 300;
+  return {size, min:Math.min(firstMin,size/2)/size,max:1-Math.min(secondMin,size/2)/size};
+ }
+ function refresh() {
+  if (refreshFrame !== null) return;
+  refreshFrame = requestAnimationFrame(() => {
+   refreshFrame = null;
+   Object.values(editors).forEach(editor => editor.refresh());
+   if (!narrow.matches) {
+    const box = workspace.getBoundingClientRect();
+    const first = panels[0].getBoundingClientRect();
+    workspace.style.setProperty('--divider-x',(first.right-box.left+6)+'px');
+    workspace.style.setProperty('--divider-y',(first.bottom-box.top+6)+'px');
+    for (const [axis,id] of [['x','column-divider'],['y','row-divider']]) {
+     const limit=bounds(axis); const handle=$(id);
+     handle.setAttribute('aria-valuemin',Math.round(limit.min*100));
+     handle.setAttribute('aria-valuemax',Math.round(limit.max*100));
+     handle.setAttribute('aria-valuenow',Math.round(ratios[axis]*100));
+     handle.setAttribute('aria-valuetext',`${Math.round(ratios[axis]*100)}% ${axis==='x'?'left column':'top row'}`);
+    }
+   }
+  });
+ }
+ function setRatio(axis,value) {
+  const limit=bounds(axis); if(limit.size<=0)return;
+  ratios[axis]=clamp(value,limit.min,limit.max);
+  const names=axis==='x'?['--left-column','--right-column']:['--top-row','--bottom-row'];
+  workspace.style.setProperty(names[0],ratios[axis]+'fr');
+  workspace.style.setProperty(names[1],(1-ratios[axis])+'fr');
+  refresh();
+ }
+ function setHeight(panel,height,handle) {
+  const minimum = panel.classList.contains('preview-panel') ? 330 : 180;
+  panel.style.height=clamp(height,minimum,1600)+'px';
+  handle.setAttribute('aria-valuenow',Math.round(parseFloat(panel.style.height)));
+  refresh();
+ }
+ function endDrag(event) {
+  if(!drag || (event?.pointerId!==undefined && event.pointerId!==drag.pointerId)) return;
+  const previous=drag;drag=null;
+  previous.handle.classList.remove('dragging');workspace.classList.remove('resizing');
+  if(previous.handle.hasPointerCapture(previous.pointerId))previous.handle.releasePointerCapture(previous.pointerId);
+  refresh();
+ }
+ function bindHandle(handle,axis,panel=null) {
+  handle.addEventListener('pointerdown',event=>{
+   if(!event.isPrimary || event.button!==0)return;
+   event.preventDefault();handle.focus();
+   drag={handle,axis,panel,pointerId:event.pointerId,startY:event.clientY,startHeight:panel?.getBoundingClientRect().height};
+   handle.setPointerCapture(event.pointerId);handle.classList.add('dragging');workspace.classList.add('resizing');
+  });
+  handle.addEventListener('pointermove',event=>{
+   if(!drag || drag.handle!==handle || event.pointerId!==drag.pointerId)return;
+   if(panel){setHeight(panel,drag.startHeight+event.clientY-drag.startY,handle);return;}
+   const rect=workspace.getBoundingClientRect();const limit=bounds(axis);
+   const position=axis==='x'?event.clientX-rect.left:event.clientY-rect.top;
+   setRatio(axis,(position-6)/limit.size);
+  });
+  handle.addEventListener('pointerup',endDrag);
+  handle.addEventListener('pointercancel',endDrag);
+  handle.addEventListener('lostpointercapture',endDrag);
+  handle.addEventListener('dblclick',()=>{
+   if(panel){panel.style.removeProperty('height');handle.setAttribute('aria-valuenow',Math.round(panel.getBoundingClientRect().height));refresh();}
+   else setRatio(axis,axis==='x'?0.5:1/3);
+  });
+  handle.addEventListener('keydown',event=>{
+   const minus=axis==='x'?'ArrowLeft':'ArrowUp',plus=axis==='x'?'ArrowRight':'ArrowDown';
+   if(![minus,plus,'Home','End'].includes(event.key))return;
+   event.preventDefault();const step=event.shiftKey?48:16;
+   if(panel){setHeight(panel,event.key==='Home'?0:event.key==='End'?1600:panel.getBoundingClientRect().height+(event.key===plus?step:-step),handle);}
+   else {const limit=bounds(axis);setRatio(axis,event.key==='Home'?limit.min:event.key==='End'?limit.max:ratios[axis]+(event.key===plus?step:-step)/limit.size);}
+  });
+ }
+ bindHandle($('column-divider'),'x');bindHandle($('row-divider'),'y');
+ for(const panel of panels){
+  const handle=document.createElement('div');handle.className='splitter mobile-resize';handle.tabIndex=0;
+  handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','horizontal');
+  handle.setAttribute('aria-label','Resize '+panel.querySelector('h2').textContent+' height');
+  handle.setAttribute('aria-valuemin',panel.classList.contains('preview-panel')?'330':'180');
+  handle.setAttribute('aria-valuemax','1600');handle.setAttribute('aria-valuenow',Math.round(panel.getBoundingClientRect().height));
+  panel.append(handle);bindHandle(handle,'y',panel);
+ }
+ const observer=new ResizeObserver(refresh);observer.observe(workspace);panels.forEach(panel=>observer.observe(panel));
+ narrow.addEventListener('change',()=>{endDrag();if(!narrow.matches)panels.forEach(panel=>panel.style.removeProperty('height'));refresh();});
+ window.addEventListener('blur',()=>endDrag());
+ window.addEventListener('resize',()=>{if(!narrow.matches){setRatio('x',ratios.x);setRatio('y',ratios.y);}refresh();});
+ if(!narrow.matches){setRatio('x',ratios.x);setRatio('y',ratios.y);}refresh();
+})();

@@ -47,3 +47,24 @@ main{padding-top:14px}
 .console-tools button:hover{color:var(--text);background:#303a47}
 .console-body #console{min-height:0;padding-top:0}
 @media(max-width:640px){.html-panel,.css-panel{height:240px}.code-panel{height:390px}.preview-panel{height:480px}.console-panel{height:auto}}
+
+/* Shared dividers resize all four panes without changing their order. */
+.workspace{position:relative;grid-template-columns:minmax(0,var(--left-column,1fr)) minmax(0,var(--right-column,1fr));grid-template-rows:minmax(0,var(--top-row,1fr)) minmax(0,var(--bottom-row,2fr))}
+.splitter{position:absolute;z-index:3;touch-action:none;user-select:none;border-radius:4px;outline:none}
+.column-splitter{left:var(--divider-x,50%);top:0;width:12px;height:100%;transform:translateX(-50%);cursor:col-resize}
+.row-splitter{left:0;top:var(--divider-y,33.333%);width:100%;height:12px;transform:translateY(-50%);cursor:row-resize}
+.splitter::after{content:"";position:absolute;background:#455163;border-radius:3px;transition:background .12s}
+.column-splitter::after{width:3px;height:34px;top:calc(50% - 17px);left:4.5px}
+.row-splitter::after{width:34px;height:3px;left:calc(50% - 17px);top:4.5px}
+.splitter:hover,.splitter:focus-visible,.splitter.dragging{background:#a0dc671c}
+.splitter:hover::after,.splitter:focus-visible::after,.splitter.dragging::after{background:var(--accent)}
+.workspace.resizing{user-select:none}
+.workspace.resizing iframe{pointer-events:none}
+.mobile-resize{display:none}
+@media(max-width:640px){
+ .workspace>.splitter{display:none}
+ .workspace>.panel{overflow:hidden;min-height:180px}
+ .workspace>.preview-panel{min-height:330px}
+ .mobile-resize{display:block;position:relative;flex:0 0 16px;height:16px;width:100%;border-top:1px solid var(--edge);background:#1c212a;cursor:row-resize;touch-action:none}
+ .mobile-resize::after{width:34px;height:3px;left:calc(50% - 17px);top:6px}
+}

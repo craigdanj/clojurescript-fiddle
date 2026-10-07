@@ -6,6 +6,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
 - HTML and CSS editors across the top; ClojureScript and Result below.
+- Drag the central dividers to resize columns and rows. Focus a divider and use arrow keys (Shift for larger steps), Home/End for limits, or double-click to reset. On narrow screens, drag the handle below each pane to adjust its height.
 - Live DOM preview in a sandboxed iframe.
 - Collapsible console docked at the bottom of Result. It starts collapsed, retains output while hidden, and opens automatically on errors.
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
