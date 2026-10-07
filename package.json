@@ -1,0 +1,18 @@
+{
+  "name": "clojurescript-fiddle",
+  "version": "1.0.0",
+  "description": "Browser-only ClojureScript, HTML, and CSS playground",
+  "main": "index.js",
+  "scripts": {
+    "check": "node --check dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "codemirror": "5.65.20",
+    "scittle": "0.8.33"
+  },
+  "private": true
+}
