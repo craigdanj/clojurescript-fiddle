@@ -156,3 +156,36 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
 .cm-s-default .CodeMirror-nonmatchingbracket { color: #ffc2c2 !important; background: #f45b5b24; text-decoration: underline wavy #f69b9b; }
 .editing-guide { display: grid; gap: 5px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #45543b; }
 .editing-guide kbd { display: inline; margin-left: 0; color: #d5e5cc; background: #ffffff08; border-color: #607454; }
+
+/* A persistent REPL session, alongside the existing four-pane fiddle. */
+.mode-toggle { display: flex; padding: 3px; gap: 2px; border: 1px solid var(--edge); border-radius: 8px; background: var(--bg); }
+.mode-toggle button { min-height: 30px; padding: 4px 11px; font-size: 13px; }
+.mode-toggle button[aria-pressed=true] { color: var(--accent); background: #283323; }
+header { gap: 12px 16px; }
+.repl-mode header .actions { margin-left: auto; }
+.repl-workspace { display: grid; flex: 1; min-height: 480px; min-width: 0; gap: 12px; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: minmax(0,1fr); }
+.repl-code-panel { --language: var(--accent); }
+.terminal-panel { --language: #89baff; background: #10151b; }
+.terminal-actions { display: flex; align-items: center; gap: 3px; }
+.terminal-actions button, #eval-expression { min-height: 30px; padding: 4px 7px; font-size: 12px; }
+#terminal-output { flex: 1; min-height: 0; overflow: auto; padding: 16px; font: 14px/1.75 var(--mono); }
+.terminal-entry { margin-bottom: 16px; }
+.terminal-line { white-space: pre-wrap; overflow-wrap: anywhere; }
+.terminal-line.command { color: #a5b5cc; border-bottom: 1px solid #252c36; padding-bottom: 7px; margin-bottom: 7px; }
+.terminal-line.result { color: var(--accent); }
+.terminal-line.error { color: #ffabb0; }
+.terminal-line.warn { color: #edcd86; }
+.terminal-line.info { color: var(--muted); }
+.terminal-input-row { display: flex; align-items: flex-start; gap: 9px; padding: 12px; border-top: 1px solid var(--edge); }
+#repl-prompt { padding-top: 7px; color: var(--accent); font: 13px/1.75 var(--mono); max-width: 30%; overflow-wrap: anywhere; }
+#repl-input { min-width: 0; min-height: 38px; max-height: 160px; flex: 1; padding: 6px; border: 1px solid #364452; border-radius: 5px; background: #171e27; line-height: 1.75; }
+#repl-input:focus { outline: 1px solid var(--accent); }
+#repl-send { color: var(--accent); font-size: 12px; }
+.repl-code-panel .editor-foot,.terminal-panel .editor-foot { flex-wrap: wrap; height: auto; min-height: 30px; padding: 5px 10px; }
+@media(max-width:1100px) { .mode-toggle { order: 0; margin-left: auto; } header .actions { margin-left: 0; } }
+@media(max-width:640px) {
+ .mode-toggle { margin-left: 0; }.mode-toggle button { padding: 4px 8px; }
+ .repl-workspace { grid-template-columns: minmax(0,1fr); grid-template-rows: 430px 480px; }
+ .repl-workspace .panel { height: auto; }
+ .terminal-input-row { gap: 5px; padding: 8px; }
+}

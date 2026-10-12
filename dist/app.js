@@ -141,12 +141,16 @@ function runner(channel) {
  });
  send('ready');
 }
+function loadRuntime() {
+ if(!runtimePromise) runtimePromise=fetch('vendor/scittle.js').then(r=>{if(!r.ok)throw Error('Could not load Scittle.');return r.text();}).catch(e=>{runtimePromise=null;throw e;});
+ return runtimePromise;
+}
 async function run() {
+ if(window.ReplUI?.isActive()){window.ReplUI.runFile();return;}
  clearPreview();const current=runNumber;clearConsole();status('Loading runtime…');
  const snapshot=Object.fromEntries(Object.entries(editors).map(([key,editor])=>[key,editor.getValue()]));
  try {
-  if(!runtimePromise) runtimePromise=fetch('vendor/scittle.js').then(r=>{if(!r.ok)throw Error('Could not load Scittle.');return r.text();}).catch(e=>{runtimePromise=null;throw e;});
-  const source=await runtimePromise;if(current!==runNumber)return;
+  const source=await loadRuntime();if(current!==runNumber)return;
   const channel=crypto.randomUUID ? crypto.randomUUID() : String(Math.random());
   const frame=document.createElement('iframe');frame.title='ClojureScript result';frame.setAttribute('sandbox','allow-scripts');activeFrame=frame;
   frame.dataset.channel=channel;frame._snapshot=snapshot;
@@ -168,7 +172,7 @@ window.addEventListener('message',e=>{
 function loadExample(name) {clearPreview();for(const key of Object.keys(editors))editors[key].setValue(examples[name][key]);run();}
 $('run').addEventListener('click',run);$('clear').addEventListener('click',clearConsole);
 $('example').addEventListener('change',()=>loadExample($('example').value));$('reset').addEventListener('click',()=>loadExample($('example').value));
-function toggleHelp(show) {$('guide').hidden=!show;$('help').setAttribute('aria-expanded',String(show));Object.values(editors).forEach(editor=>editor.refresh());}
+function toggleHelp(show) {$('guide').hidden=!show;$('help').setAttribute('aria-expanded',String(show));Object.values(editors).forEach(editor=>editor.refresh());window.ReplUI?.refresh();}
 $('help').addEventListener('click',()=>toggleHelp($('guide').hidden));$('close-guide').addEventListener('click',()=>toggleHelp(false));
 document.addEventListener('keydown',e=>{if(!e.defaultPrevented&&(e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});
 for(const key of Object.keys(editors))editors[key].setValue(examples.counter[key]);
@@ -193,7 +197,7 @@ run();
   refreshFrame = requestAnimationFrame(() => {
    refreshFrame = null;
    Object.values(editors).forEach(editor => editor.refresh());
-   if (!narrow.matches && !workspace.classList.contains('is-maximized')) {
+   if (!narrow.matches && !workspace.hidden && !workspace.classList.contains('is-maximized')) {
     const box = workspace.getBoundingClientRect();
     const first = panels[0].getBoundingClientRect();
     workspace.style.setProperty('--divider-x',(first.right-box.left+6)+'px');

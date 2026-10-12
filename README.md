@@ -1,6 +1,6 @@
 # ClojureScript Fiddle
 
-A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open the page, edit the code, and press **Run** or **Ctrl/Cmd + Enter**. The initial counter runs automatically.
+A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open the page, edit the code, and press **Run** or **Ctrl/Cmd + Enter**. The initial Fiddle counter runs automatically. Use the Fiddle / REPL toggle in the header to change editor mode.
 
 ## Features
 
@@ -12,7 +12,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 - Live DOM preview in a sandboxed iframe.
 - Collapsible console docked at the bottom of Result. It starts collapsed, retains output while hidden, and opens automatically on errors.
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
-- Each Run creates a fresh interpreter, document, and state.
+- Each Fiddle Run creates a fresh interpreter, document, and state; REPL evaluations share a persistent interpreter until Restart session.
 - Run discards the previous preview and its asynchronous callbacks before starting fresh. Clear clears the console only.
 - Counter, sequences/maps, and color examples. Reset restores the selected example.
 - Responsive layout and accessible button labels.
@@ -43,6 +43,9 @@ A synchronous infinite loop can block the browser thread. Reload or close the ta
 - `dist/index.html`: page layout and asset references.
 - `dist/style.css`: responsive workspace theme.
 - `dist/app.js`: editors, examples, preview lifecycle, execution, and console.
+- `dist/repl-core.js`: persistent sandboxed REPL session and top-level expression boundaries.
+- `dist/repl.js`: REPL editor, terminal, prompt history, and mode switching.
+- `tests/repl.cjs`: runtime, session lifecycle, and expression-boundary checks (`npm test`).
 - `dist/pane-maximize.js`: pane maximize/restore controls and keyboard handling.
 - `dist/vendor/`: locally bundled runtime, editors, and dependency licenses.
 - `package.json` / `package-lock.json`: exact dependency versions.
@@ -79,3 +82,17 @@ Typing an opening bracket or double quote inserts its partner; typing a closing 
 Collection selection ignores delimiters inside strings, regex literals, comments, and character literals; it includes the `#` prefix for sets and anonymous functions. It selects balanced bracketed collections, not arbitrary reader forms or a full structural-editing AST. Moving the cursor or changing code clears the selection-expansion history. Reindentation changes leading whitespace, not general code formatting.
 
 The editing helpers live in `dist/clojure-editing.js`. CodeMirror add-ons are bundled in `dist/vendor/` under CodeMirror's existing MIT license.
+
+## REPL mode
+
+Use the **Fiddle / REPL** toggle in the header. Fiddle keeps the existing four resizable panes. REPL shows a ClojureScript editor on the left and a terminal on the right (stacked on narrow screens).
+
+- **Run file** or **Ctrl/Cmd+Enter** evaluates the entire REPL editor in the current session. Printed output and the final return value appear in the terminal.
+- **Eval expression** or **Alt/Option+Enter** evaluates selected text. With no selection, it evaluates the top-level expression at the cursor. At a form's end it uses that form; between forms it uses the next one. Select a nested expression explicitly to evaluate it on its own.
+- Type directly at the terminal prompt and press **Enter** to evaluate. **Shift+Enter** inserts a new line. Up at the beginning and Down at the end of the input recall submitted commands.
+- Definitions, functions, atoms, and the current namespace persist between evaluations. Errors are printed; subsequent evaluations can continue.
+- **Clear** removes terminal output only. **Restart session** discards the REPL interpreter and its definitions, timers, and queued work, while preserving the editor and input history.
+- Fiddle and REPL retain separate code buffers and execution environments while switching modes. REPL starts with a data/functions example and does not load the Fiddle HTML or CSS. Neither buffer is saved across a page reload.
+- The REPL retains the same Clojure editing shortcuts. It is a ClojureScript terminal, not an operating-system shell or a full terminal/ANSI emulator.
+
+The runtime is a persistent sandboxed iframe using bundled Scittle, entirely client-side. Evaluation requests are processed in order. Terminal output is capped at 1,000 rows and 20,000 characters per row; at most 100 submitted transcript groups and 100 input-history entries are retained. As in Fiddle, a synchronous infinite loop can block the browser thread; session restart cannot interrupt it while the thread is blocked.
