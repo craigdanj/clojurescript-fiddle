@@ -5,6 +5,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 ## Features
 
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
+- ClojureScript bracket matching, automatic bracket/double-quote pairs, smart indentation, comment toggling, active-line highlighting, and enclosing-collection selection.
 - HTML and CSS editors across the top; ClojureScript and Result below.
 - Drag the central dividers to resize columns and rows. Focus a divider and use arrow keys (Shift for larger steps), Home/End for limits, or double-click to reset. On narrow screens, drag the handle below each pane to adjust its height.
 - Maximize any pane with its header button; click Restore or press Escape to return to your previous layout. Editor contents, undo history, divider positions, and running preview state are retained. Escape also works inside Result.
@@ -58,3 +59,23 @@ No backend, JVM, database, or build step is needed to serve the finished page.
 Project code is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Craig Johnson.
 
 Bundled third-party dependencies retain their own licenses: CodeMirror is MIT-licensed and Scittle is EPL-1.0-licensed. Their license files are included in `dist/vendor/`.
+
+## ClojureScript editing
+
+| Control | Action |
+| --- | --- |
+| Enter | Insert a new line with Clojure-aware indentation. Inside an empty bracket pair, create an indented line between the brackets. |
+| Tab / Shift+Tab | Smart-indent the current line or selection / decrease indentation. Within code, Tab inserts spaces. |
+| Ctrl/Cmd+/ | Toggle line comments on the current line or selection. |
+| Ctrl/Cmd+Shift+I | Reindent the selection; when nothing is selected, reindent the whole editor. |
+| Alt/Option+Up | Select the enclosing list, vector, or map. Repeat to expand outward. |
+| Alt/Option+Down | Restore the previous selection from expansion history. |
+| Ctrl/Cmd+Enter | Run the fiddle. |
+
+Shrink requires a previous Expand operation; it does not undo arbitrary manual selections.
+
+Typing an opening bracket or double quote inserts its partner; typing a closing bracket skips over an existing partner. Backspace between an empty pair removes both. Typing an opening bracket with text selected wraps the selection. Single quotes remain Clojure reader quotes and are not paired.
+
+Collection selection ignores delimiters inside strings, regex literals, comments, and character literals; it includes the `#` prefix for sets and anonymous functions. It selects balanced bracketed collections, not arbitrary reader forms or a full structural-editing AST. Moving the cursor or changing code clears the selection-expansion history. Reindentation changes leading whitespace, not general code formatting.
+
+The editing helpers live in `dist/clojure-editing.js`. CodeMirror add-ons are bundled in `dist/vendor/` under CodeMirror's existing MIT license.

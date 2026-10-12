@@ -148,3 +148,11 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
  .pane-actions .filename { display: none; }
  .pane-maximize { flex-basis: 34px; width: 34px; min-height: 34px; }
 }
+
+/* Clojure-aware editing feedback. */
+.CodeMirror-activeline-background { background: #ffffff04; }
+.CodeMirror-activeline-gutter .CodeMirror-linenumber { color: #c0d4a7; }
+.cm-s-default .CodeMirror-matchingbracket { color: #d5fcae !important; background: #a8d87425; outline: 1px solid #9dbc7059; border-radius: 2px; }
+.cm-s-default .CodeMirror-nonmatchingbracket { color: #ffc2c2 !important; background: #f45b5b24; text-decoration: underline wavy #f69b9b; }
+.editing-guide { display: grid; gap: 5px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #45543b; }
+.editing-guide kbd { display: inline; margin-left: 0; color: #d5e5cc; background: #ffffff08; border-color: #607454; }

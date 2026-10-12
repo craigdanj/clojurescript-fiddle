@@ -102,6 +102,7 @@ const editors = {};
 for (const [name, mode] of [['cljs','clojure'],['html','text/html'],['css','css']]) {
  editors[name] = CodeMirror.fromTextArea($(name), {mode,lineNumbers:true,tabSize:2,indentUnit:2,lineWrapping:true, extraKeys: {'Ctrl-Enter':run,'Cmd-Enter':run,Tab:cm=>cm.replaceSelection('  ')}});
 }
+ClojureEditing.install(editors.cljs, CodeMirror);
 editors.cljs.on('cursorActivity',cm=>{const c=cm.getCursor();$('cursor').textContent=`Ln ${c.line+1}, Col ${c.ch+1}`;});
 let activeFrame=null, runNumber=0, logCount=0, runtimePromise=null, loadingTimer=null;
 function status(text,state='') { $('status').textContent=text; $('status').dataset.state=state; }
