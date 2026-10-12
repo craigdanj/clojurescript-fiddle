@@ -114,7 +114,7 @@ function log(kind, values) {
  const content=document.createElement('span'); content.textContent=values.join(' ').slice(0,20000);
  row.append(prefix,content);$('console').append(row);$('log-count').textContent=String(++logCount);$('console').scrollTop=$('console').scrollHeight;
 }
-function stop() {runNumber++;clearTimeout(loadingTimer);if(activeFrame) activeFrame.remove();activeFrame=null;$('stop').disabled=true;status('Stopped');$('preview').textContent='';}
+function clearPreview() {runNumber++;clearTimeout(loadingTimer);if(activeFrame) activeFrame.remove();activeFrame=null;$('preview').textContent='';}
 function runner(channel) {
  const send=(kind,...values)=>parent.postMessage({channel,kind,values},'*');
  window.addEventListener('keydown',e=>{if(e.key==='Escape')send('restore-pane');});
@@ -141,7 +141,7 @@ function runner(channel) {
  send('ready');
 }
 async function run() {
- stop();const current=runNumber;clearConsole();status('Loading runtime…');$('stop').disabled=false;
+ clearPreview();const current=runNumber;clearConsole();status('Loading runtime…');
  const snapshot=Object.fromEntries(Object.entries(editors).map(([key,editor])=>[key,editor.getValue()]));
  try {
   if(!runtimePromise) runtimePromise=fetch('vendor/scittle.js').then(r=>{if(!r.ok)throw Error('Could not load Scittle.');return r.text();}).catch(e=>{runtimePromise=null;throw e;});
@@ -153,7 +153,7 @@ async function run() {
   frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><style id="fiddle-style"></style></head><body><div id="fiddle-root"></div><script>'+escapeScript(source)+'<\/script><script>scittle.core.disable_auto_eval();('+runner.toString()+')('+JSON.stringify(channel)+');<\/script></body></html>';
   $('preview').replaceChildren(frame);status('Running…');
   loadingTimer=setTimeout(()=>{if(activeFrame===frame){status('Runtime did not respond','error');log('error',['The preview did not respond. Try Run again.']);}},15000);
- }catch(e){if(current!==runNumber)return;status('Could not run','error');log('error',[e.message]);$('stop').disabled=true;}
+ }catch(e){if(current!==runNumber)return;status('Could not run','error');log('error',[e.message]);}
 }
 window.addEventListener('message',e=>{
  if(!activeFrame || e.source!==activeFrame.contentWindow || e.data?.channel!==activeFrame.dataset.channel) return;
@@ -164,8 +164,8 @@ window.addEventListener('message',e=>{
  else if(kind==='restore-pane')document.dispatchEvent(new Event('restore-pane'));
  else if(['log','warn','error','info','result'].includes(kind))log(kind,values.map(String));
 });
-function loadExample(name) {stop();for(const key of Object.keys(editors))editors[key].setValue(examples[name][key]);run();}
-$('run').addEventListener('click',run);$('stop').addEventListener('click',stop);$('clear').addEventListener('click',clearConsole);
+function loadExample(name) {clearPreview();for(const key of Object.keys(editors))editors[key].setValue(examples[name][key]);run();}
+$('run').addEventListener('click',run);$('clear').addEventListener('click',clearConsole);
 $('example').addEventListener('change',()=>loadExample($('example').value));$('reset').addEventListener('click',()=>loadExample($('example').value));
 function toggleHelp(show) {$('guide').hidden=!show;$('help').setAttribute('aria-expanded',String(show));Object.values(editors).forEach(editor=>editor.refresh());}
 $('help').addEventListener('click',()=>toggleHelp($('guide').hidden));$('close-guide').addEventListener('click',()=>toggleHelp(false));

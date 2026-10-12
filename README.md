@@ -12,7 +12,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 - Collapsible console docked at the bottom of Result. It starts collapsed, retains output while hidden, and opens automatically on errors.
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
 - Each Run creates a fresh interpreter, document, and state.
-- Stop discards the preview and its asynchronous callbacks. Clear clears the console only.
+- Run discards the previous preview and its asynchronous callbacks before starting fresh. Clear clears the console only.
 - Counter, sequences/maps, and color examples. Reset restores the selected example.
 - Responsive layout and accessible button labels.
 - Runtime and editor assets are bundled locally. No CDN or code execution server is needed.
@@ -35,7 +35,7 @@ HTML is inserted into the preview document. Write behavior in the ClojureScript 
 
 The iframe has `sandbox="allow-scripts"` without same-origin access. Preview code cannot access the parent page's DOM or storage. The console accepts messages only from the active iframe with its per-run identifier. User code can still make browser network requests where permitted. This is a convenience playground, not a security boundary for hostile code.
 
-A synchronous infinite loop can block the browser thread, including Stop. Reload or close the tab in that case. Stop is intended for timers and other asynchronous activity, not preempting synchronous computation. Console is capped at 500 rows and 20,000 characters per row.
+A synchronous infinite loop can block the browser thread. Reload or close the tab in that case. Console is capped at 500 rows and 20,000 characters per row.
 
 ## Files
 
@@ -52,3 +52,9 @@ A synchronous infinite loop can block the browser thread, including Stop. Reload
 - [CodeMirror](https://codemirror.net/5/) 5.65.20 — MIT. License in `dist/vendor/CODEMIRROR-LICENSE`.
 
 No backend, JVM, database, or build step is needed to serve the finished page.
+
+## License
+
+Project code is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Craig Johnson.
+
+Bundled third-party dependencies retain their own licenses: CodeMirror is MIT-licensed and Scittle is EPL-1.0-licensed. Their license files are included in `dist/vendor/`.
