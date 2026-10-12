@@ -7,6 +7,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
 - HTML and CSS editors across the top; ClojureScript and Result below.
 - Drag the central dividers to resize columns and rows. Focus a divider and use arrow keys (Shift for larger steps), Home/End for limits, or double-click to reset. On narrow screens, drag the handle below each pane to adjust its height.
+- Maximize any pane with its header button; click Restore or press Escape to return to your previous layout. Editor contents, undo history, divider positions, and running preview state are retained. Escape also works inside Result.
 - Live DOM preview in a sandboxed iframe.
 - Collapsible console docked at the bottom of Result. It starts collapsed, retains output while hidden, and opens automatically on errors.
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
@@ -41,6 +42,7 @@ A synchronous infinite loop can block the browser thread, including Stop. Reload
 - `dist/index.html`: page layout and asset references.
 - `dist/style.css`: responsive workspace theme.
 - `dist/app.js`: editors, examples, preview lifecycle, execution, and console.
+- `dist/pane-maximize.js`: pane maximize/restore controls and keyboard handling.
 - `dist/vendor/`: locally bundled runtime, editors, and dependency licenses.
 - `package.json` / `package-lock.json`: exact dependency versions.
 

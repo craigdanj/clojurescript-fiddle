@@ -117,6 +117,7 @@ function log(kind, values) {
 function stop() {runNumber++;clearTimeout(loadingTimer);if(activeFrame) activeFrame.remove();activeFrame=null;$('stop').disabled=true;status('Stopped');$('preview').textContent='';}
 function runner(channel) {
  const send=(kind,...values)=>parent.postMessage({channel,kind,values},'*');
+ window.addEventListener('keydown',e=>{if(e.key==='Escape')send('restore-pane');});
  const stringify=v=>{try{return typeof v==='string'?v:JSON.stringify(v)??String(v);}catch{return String(v);}};
  for(const kind of ['log','warn','error','info']) console[kind]=(...args)=>send(kind,...args.map(stringify));
  window.addEventListener('error',e=>send('error',e.message));
@@ -160,6 +161,7 @@ window.addEventListener('message',e=>{
  if(kind==='ready') {clearTimeout(loadingTimer);activeFrame.contentWindow.postMessage({channel:activeFrame.dataset.channel,kind:'execute',...activeFrame._snapshot},'*');}
  else if(kind==='done')status(`Finished · ${values[0]} ms`,'success');
  else if(kind==='failed')status('Execution error','error');
+ else if(kind==='restore-pane')document.dispatchEvent(new Event('restore-pane'));
  else if(['log','warn','error','info','result'].includes(kind))log(kind,values.map(String));
 });
 function loadExample(name) {stop();for(const key of Object.keys(editors))editors[key].setValue(examples[name][key]);run();}
@@ -190,7 +192,7 @@ run();
   refreshFrame = requestAnimationFrame(() => {
    refreshFrame = null;
    Object.values(editors).forEach(editor => editor.refresh());
-   if (!narrow.matches) {
+   if (!narrow.matches && !workspace.classList.contains('is-maximized')) {
     const box = workspace.getBoundingClientRect();
     const first = panels[0].getBoundingClientRect();
     workspace.style.setProperty('--divider-x',(first.right-box.left+6)+'px');
@@ -228,7 +230,7 @@ run();
  }
  function bindHandle(handle,axis,panel=null) {
   handle.addEventListener('pointerdown',event=>{
-   if(!event.isPrimary || event.button!==0)return;
+   if(workspace.classList.contains('is-maximized') || !event.isPrimary || event.button!==0)return;
    event.preventDefault();handle.focus();
    drag={handle,axis,panel,pointerId:event.pointerId,startY:event.clientY,startHeight:panel?.getBoundingClientRect().height};
    handle.setPointerCapture(event.pointerId);handle.classList.add('dragging');workspace.classList.add('resizing');
@@ -267,6 +269,7 @@ run();
  const observer=new ResizeObserver(refresh);observer.observe(workspace);panels.forEach(panel=>observer.observe(panel));
  narrow.addEventListener('change',()=>{endDrag();if(!narrow.matches)panels.forEach(panel=>panel.style.removeProperty('height'));refresh();});
  window.addEventListener('blur',()=>endDrag());
- window.addEventListener('resize',()=>{if(!narrow.matches){setRatio('x',ratios.x);setRatio('y',ratios.y);}refresh();});
+ workspace.addEventListener('pane-layout-change',()=>{endDrag();refresh();});
+ window.addEventListener('resize',()=>{if(!narrow.matches && !workspace.classList.contains('is-maximized')){setRatio('x',ratios.x);setRatio('y',ratios.y);}refresh();});
  if(!narrow.matches){setRatio('x',ratios.x);setRatio('y',ratios.y);}refresh();
 })();

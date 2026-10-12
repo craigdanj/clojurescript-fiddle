@@ -129,3 +129,22 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
 }
 @media(max-width:370px) { .actions { width: 100%; justify-content: flex-end; } }
 @media(prefers-reduced-motion:reduce) { *, *::before, *::after { transition: none !important; } }
+
+/* Maximize in the workspace without moving or recreating its contents. */
+.pane-actions { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.pane-actions .filename { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pane-maximize { flex: 0 0 30px; min-height: 30px; width: 30px; padding: 6px; color: var(--muted); }
+.pane-maximize[aria-pressed=true] { color: var(--accent); background: #b3e57712; }
+.workspace.is-maximized { display: grid; grid-template-areas: 'maximized'; grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); }
+.workspace.is-maximized > .panel:not(.is-maximized-pane),
+.workspace.is-maximized > .splitter,
+.workspace.is-maximized .mobile-resize { display: none; }
+.workspace.is-maximized > .is-maximized-pane { grid-area: maximized; height: auto !important; min-height: 0; }
+@media(max-width:640px) {
+ body.pane-maximized { height: 100dvh; }
+ .pane-maximized main { flex: 1 0 0; }
+ .workspace.is-maximized { min-height: 330px; }
+ .pane-actions { gap: 5px; }
+ .pane-actions .filename { display: none; }
+ .pane-maximize { flex-basis: 34px; width: 34px; min-height: 34px; }
+}
