@@ -25,7 +25,7 @@ header { display: flex; align-items: center; flex-wrap: wrap; flex-shrink: 0; mi
 .light { color: #aab79d; font-weight: 400; }
 .tools { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-left: auto; min-width: 0; }
 .example-control { display: flex; align-items: center; gap: 8px; padding: 0 0 0 10px; border: 1px solid var(--edge); border-radius: 7px; background: var(--raised); }
-.tools label { color: var(--muted); font-size: 12px; }
+.example-control label { color: var(--muted); font-size: 12px; }
 select { min-width: 0; max-width: 215px; height: 36px; padding: 0 28px 0 3px; background: var(--raised); color: var(--text); border: 0; border-radius: 7px; cursor: pointer; }
 .actions { display: flex; align-items: center; gap: 6px; padding-left: 18px; border-left: 1px solid var(--edge); }
 .primary { min-height: 38px; padding: 7px 12px; background: var(--accent); color: #223215; font-weight: 650; box-shadow: 0 2px 6px #0003; }
@@ -117,7 +117,7 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
  kbd { display: none; }
  .tools { gap: 2px; }.tools button { padding: 7px 8px; }
  .example-control { flex: 1; min-width: 0; padding-left: 8px; }
- .tools label { display: none; }.tools select { width: 100%; max-width: none; padding-left: 0; }
+ .example-control label { display: none; }.example-control select { width: 100%; max-width: none; padding-left: 0; }
  main { padding: 10px; }
  .workspace { display: flex; flex-direction: column; min-height: 0; }
  .html-panel, .css-panel { height: 260px; }.code-panel { height: 410px; }.preview-panel { height: 480px; }
@@ -175,6 +175,7 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
 .mode-toggle button { min-height: 30px; padding: 4px 11px; font-size: 13px; }
 .mode-toggle button[aria-pressed=true] { color: var(--accent); background: #283323; }
 header { gap: 12px 16px; }
+.repl-mode header .tools { display: none; }
 .repl-mode header .actions { margin-left: auto; }
 .repl-workspace { display: grid; flex: 1; min-height: 480px; min-width: 0; gap: 12px; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: minmax(0,1fr); }
 .repl-code-panel { --language: var(--accent); }
@@ -222,3 +223,8 @@ header { position: relative; z-index: 5; }
 #project-message:empty { display: none; }
 #project-message[data-error=true] { color: #ffabb0; }
 #project-undo { align-self: flex-start; }
+
+/* Keep shared actions adjacent in both modes and when the header wraps. */
+.fiddle-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.header-links { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+@media(max-width:640px) { .fiddle-controls { flex: 1 1 auto; } }
