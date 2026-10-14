@@ -17,7 +17,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 - Each Fiddle Run creates a fresh interpreter, document, and state; REPL evaluations share a persistent interpreter until Restart session.
 - Run discards the previous preview and its asynchronous callbacks before starting fresh. Clear clears the console only.
 - Counter, sequences/maps, and color examples. Reset restores the selected example.
-- Responsive layout and accessible button labels.
+- Blue-gray theme with coral (`#FF7F50`) accents, readable syntax colors, responsive layout, and accessible button labels.
 - Runtime and editor assets are bundled locally. No CDN or code execution server is needed.
 
 ## Run locally
@@ -43,7 +43,8 @@ A synchronous infinite loop can block the browser thread. Reload or close the ta
 ## Files
 
 - `dist/index.html`: page layout and asset references.
-- `dist/style.css`: responsive workspace theme.
+- `dist/style.css`: current coral-accent responsive workspace theme.
+- `dist/style2.css`: original blue-gray and green-accent stylesheet. To use it, change the stylesheet link in `dist/index.html` from `style.css` to `style2.css`.
 - `dist/app.js`: editors, examples, preview lifecycle, execution, and console.
 - `dist/project-files.js`: versioned project format, validation, serialization, and import/undo controller.
 - `dist/projects.js`: Project menu, browser file download/import, and workspace restoration.
