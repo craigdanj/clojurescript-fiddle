@@ -16,7 +16,7 @@ test('mode switch, full file, selection, current form, prompt, clear and restart
  const nodes=new Map(),document=new Element(),calls=[];let session;
  document.body=new Element();document.createElement=()=>new Element();document.getElementById=id=>{if(!nodes.has(id))nodes.set(id,new Element());return nodes.get(id);};
  const get=document.getElementById,window={};let code='',selection='',cursor=0;
- const editor={setValue:s=>code=s,getValue:()=>code,getSelection:()=>selection,somethingSelected:()=>!!selection,getCursor:()=>({line:0,ch:cursor}),indexFromPos:p=>p.ch,refresh(){this.refreshed=true;},focus(){this.focused=true;},on(){}};
+ const editor={setValue:s=>code=s,getValue:()=>code,getSelection:()=>selection,somethingSelected:()=>!!selection,getCursor:()=>({line:0,ch:cursor}),indexFromPos:p=>p.ch,clearHistory(){this.historyCleared=true;},refresh(){this.refreshed=true;},focus(){this.focused=true;},on(){}};
  const FiddleRepl={expressionAt,Session:class{constructor(options){session=this;this.options=options;this.resets=0;}async evaluate(source,id){calls.push(source);this.options.onMessage({kind:'result',values:['value'],id});this.options.onMessage({kind:'done',values:['user'],id});}reset(){this.resets++;}}};
  const context={document,window,FiddleRepl,loadRuntime(){},CodeMirror:{fromTextArea:()=>editor},ClojureEditing:{install(){}},ClojureStructure:{install(){}},editors:{cljs:{refresh(){}}},ResizeObserver:class{observe(){}},Event,requestAnimationFrame:fn=>fn()};
  vm.runInNewContext(fs.readFileSync(require.resolve('../dist/repl.js'),'utf8'),context);
@@ -30,4 +30,11 @@ test('mode switch, full file, selection, current form, prompt, clear and restart
  click('mode-fiddle');assert(!get('workspace').hidden);assert(get('repl-workspace').hidden);assert.equal(get('run-label').textContent,'Run');
  click('mode-repl');assert.equal(editor.getValue(),code);assert.equal(session.resets,0);
  click('repl-restart');assert.equal(session.resets,1);assert.equal(editor.getValue(),code);
+ const evaluations=calls.length;
+ get('repl-input').value='old pending text';
+ window.ReplUI.loadCode('(def imported 42)');
+ assert.equal(window.ReplUI.getCode(),'(def imported 42)');assert.equal(session.resets,2);assert(editor.historyCleared);
+ assert.equal(get('repl-input').value,'');assert.equal(get('repl-prompt').textContent,'user=>');
+ assert.equal(get('terminal-output').children.length,1);assert.equal(calls.length,evaluations);
+ window.ReplUI.switchMode('fiddle');assert.equal(window.ReplUI.isActive(),false);
 });

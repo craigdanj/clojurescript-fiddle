@@ -202,3 +202,23 @@ header { gap: 12px 16px; }
  .repl-workspace .panel { height: auto; }
  .terminal-input-row { gap: 5px; padding: 8px; }
 }
+
+/* Project files are available in both editor modes without a permanent toolbar. */
+header { position: relative; z-index: 5; }
+.project-menu { flex-shrink: 0; }
+.project-menu summary { padding: 7px 11px; min-height: 36px; border: 1px solid var(--edge); border-radius: 7px; cursor: pointer; color: var(--muted); }
+.project-menu summary:hover, .project-menu[open] summary { background: var(--raised); color: var(--accent); }
+.project-menu summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.project-controls { position: absolute; top: calc(100% + 6px); right: 14px; width: min(360px,calc(100vw - 28px)); max-height: calc(100dvh - 190px); overflow: auto; display: flex; flex-direction: column; gap: 9px; padding: 16px; border: 1px solid var(--edge); border-radius: 9px; background: var(--panel); box-shadow: 0 12px 32px #0008; }
+.project-controls label { font-size: 12px; color: var(--muted); }
+#project-name { width: 100%; min-width: 0; padding: 8px 10px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--edge); border-radius: 5px; }
+#project-name:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.project-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.project-buttons button { border-color: var(--edge); font-size: 12px; }
+#project-download, #project-undo { color: var(--accent); }
+.project-controls p { margin: 0; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.project-note { color: var(--muted); }
+#project-message { color: var(--accent); }
+#project-message:empty { display: none; }
+#project-message[data-error=true] { color: #ffabb0; }
+#project-undo { align-self: flex-start; }

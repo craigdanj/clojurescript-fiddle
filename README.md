@@ -4,6 +4,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 
 ## Features
 
+- Download and import named projects from the Project menu in either mode. One portable file keeps all four code buffers and the active mode; Undo import restores the previous code.
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
 - ClojureScript bracket matching, automatic bracket/double-quote pairs, smart indentation, comment toggling, active-line highlighting, and enclosing-collection selection.
 - Structural editing in both code editors: forward/backward slurp and barf, splice, and wrap with a compact Structure menu and keyboard shortcuts.
@@ -44,6 +45,9 @@ A synchronous infinite loop can block the browser thread. Reload or close the ta
 - `dist/index.html`: page layout and asset references.
 - `dist/style.css`: responsive workspace theme.
 - `dist/app.js`: editors, examples, preview lifecycle, execution, and console.
+- `dist/project-files.js`: versioned project format, validation, serialization, and import/undo controller.
+- `dist/projects.js`: Project menu, browser file download/import, and workspace restoration.
+- `tests/projects.cjs`: round trips, invalid-file handling, file controls, and undo checks.
 - `dist/repl-core.js`: persistent sandboxed REPL session and top-level expression boundaries.
 - `dist/repl.js`: REPL editor, terminal, prompt history, and mode switching.
 - `tests/repl.cjs`: runtime, session lifecycle, and expression-boundary checks (`npm test`).
@@ -112,7 +116,24 @@ Use the **Fiddle / REPL** toggle in the header. Fiddle keeps the existing four r
 - Type directly at the terminal prompt and press **Enter** to evaluate. **Shift+Enter** inserts a new line. Up at the beginning and Down at the end of the input recall submitted commands.
 - Definitions, functions, atoms, and the current namespace persist between evaluations. Errors are printed; subsequent evaluations can continue.
 - **Clear** removes terminal output only. **Restart session** discards the REPL interpreter and its definitions, timers, and queued work, while preserving the editor and input history.
-- Fiddle and REPL retain separate code buffers and execution environments while switching modes. REPL starts with a data/functions example and does not load the Fiddle HTML or CSS. Neither buffer is saved across a page reload.
+- Fiddle and REPL retain separate code buffers and execution environments while switching modes. REPL starts with a data/functions example and does not load the Fiddle HTML or CSS. Neither buffer is automatically saved across a page reload. Use Project → Download project to keep your work.
 - The REPL retains the same Clojure editing shortcuts. It is a ClojureScript terminal, not an operating-system shell or a full terminal/ANSI emulator.
 
 The runtime is a persistent sandboxed iframe using bundled Scittle, entirely client-side. Evaluation requests are processed in order. Terminal output is capped at 1,000 rows and 20,000 characters per row; at most 100 submitted transcript groups and 100 input-history entries are retained. As in Fiddle, a synchronous infinite loop can block the browser thread; session restart cannot interrupt it while the thread is blocked.
+
+
+## Download and import projects
+
+Open **Project** in the header (available in both modes), enter a name, and choose **Download project**. Your browser downloads a `.cljsfiddle.json` file. Choose **Import project** to reopen it from your computer; you can import from either mode.
+
+Every project contains:
+
+- The project name and selected editor mode.
+- Fiddle HTML (`index.html`), CSS (`style.css`), and ClojureScript (`main.cljs`).
+- The independent REPL editor (`repl.cljs`).
+
+Import replaces **both** modes' code and switches to the saved mode. The current preview and REPL session are cleared; imported code is never run automatically. Press Run / Run file or evaluate an expression when ready. **Undo import** restores the code, name, and mode from before the last successful import. This backup lasts until another successful import, Undo import, or a page reload; it does not restore live definitions, output, cursor positions, or editor undo histories.
+
+Project files contain source code only. They do not capture console/terminal output, terminal command history, live definitions or atoms, pending terminal input, pane dimensions, or external dependencies. Files are read and downloaded locally in the browser; there is no project-upload server.
+
+The versioned JSON format uses `format: "clojurescript-fiddle"`, `version: 1`, `name`, `mode` (`"fiddle"` or `"repl"`), and a `files` object containing all four filenames above as text values. Empty code is supported. Import validates the complete document before replacing editors; malformed files, unsupported versions, missing/non-text code fields, and files over 5 MiB are rejected. Download enforces the same size limit. The download is a project document for this editor, not a standalone website or a ZIP of the playground application.

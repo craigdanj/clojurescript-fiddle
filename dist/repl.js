@@ -61,6 +61,15 @@
  function restart(){
   generation++;queue=Promise.resolve();session.reset();namespace='user';byId('repl-prompt').textContent='user=>';setStatus('Ready');write('info','Session restarted. Definitions cleared.');
  }
+ function loadCode(code) {
+  // Imports never evaluate code or retain definitions from a different project.
+  generation++;queue=Promise.resolve();session.reset();namespace='user';
+  byId('repl-prompt').textContent='user=>';setStatus('Ready');
+  terminal.replaceChildren();groups.clear();rowCount=0;
+  history.length=0;historyIndex=0;draft='';prompt.value='';resizePrompt();
+  editor.setValue(code);editor.clearHistory();
+  write('info','Project loaded. Run the file or evaluate an expression to begin a fresh session.');
+ }
  function switchMode(next) {
   if(next===mode)return;
   document.dispatchEvent(new Event('restore-pane'));
@@ -91,6 +100,6 @@
  });
  editor.on('cursorActivity',()=>{const c=editor.getCursor();byId('repl-cursor').textContent=`Ln ${c.line+1}, Col ${c.ch+1}`;});
  const observer=new ResizeObserver(()=>editor.refresh());observer.observe(byId('repl-workspace'));
- window.ReplUI={isActive:()=>mode==='repl',runFile,runExpression,refresh:()=>editor.refresh()};
+ window.ReplUI={isActive:()=>mode==='repl',runFile,runExpression,refresh:()=>editor.refresh(),getCode:()=>editor.getValue(),loadCode,switchMode};
  write('info','ClojureScript REPL · Definitions persist until Restart session.\nRun the file, evaluate an expression, or type at the prompt below.');
 })();
