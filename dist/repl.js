@@ -15,7 +15,7 @@
 ;; Try (average [10 20 30]) in the terminal.
 `;
  const editor=CodeMirror.fromTextArea(byId('repl-code'),{value:starter,mode:'clojure',lineNumbers:true,lineWrapping:true,tabSize:2,indentUnit:2,extraKeys:{'Ctrl-Enter':runFile,'Cmd-Enter':runFile,'Alt-Enter':runExpression}});
- editor.setValue(starter);ClojureEditing.install(editor,CodeMirror);
+ editor.setValue(starter);ClojureEditing.install(editor,CodeMirror);ClojureStructure.install(editor);
  const prompt=byId('repl-input'),terminal=byId('terminal-output');
  let mode='fiddle',queue=Promise.resolve(),generation=0,sequence=0,rowCount=0,namespace='user';
  const groups=new Map(),history=[];let historyIndex=0,draft='';

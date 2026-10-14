@@ -18,7 +18,7 @@ test('mode switch, full file, selection, current form, prompt, clear and restart
  const get=document.getElementById,window={};let code='',selection='',cursor=0;
  const editor={setValue:s=>code=s,getValue:()=>code,getSelection:()=>selection,somethingSelected:()=>!!selection,getCursor:()=>({line:0,ch:cursor}),indexFromPos:p=>p.ch,refresh(){this.refreshed=true;},focus(){this.focused=true;},on(){}};
  const FiddleRepl={expressionAt,Session:class{constructor(options){session=this;this.options=options;this.resets=0;}async evaluate(source,id){calls.push(source);this.options.onMessage({kind:'result',values:['value'],id});this.options.onMessage({kind:'done',values:['user'],id});}reset(){this.resets++;}}};
- const context={document,window,FiddleRepl,loadRuntime(){},CodeMirror:{fromTextArea:()=>editor},ClojureEditing:{install(){}},editors:{cljs:{refresh(){}}},ResizeObserver:class{observe(){}},Event,requestAnimationFrame:fn=>fn()};
+ const context={document,window,FiddleRepl,loadRuntime(){},CodeMirror:{fromTextArea:()=>editor},ClojureEditing:{install(){}},ClojureStructure:{install(){}},editors:{cljs:{refresh(){}}},ResizeObserver:class{observe(){}},Event,requestAnimationFrame:fn=>fn()};
  vm.runInNewContext(fs.readFileSync(require.resolve('../dist/repl.js'),'utf8'),context);
  const click=id=>get(id).dispatchEvent(new Event('click'));
  click('mode-repl');assert(get('workspace').hidden);assert(!get('repl-workspace').hidden);assert.equal(get('run-label').textContent,'Run file');

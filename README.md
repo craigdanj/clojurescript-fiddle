@@ -6,6 +6,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
 - ClojureScript bracket matching, automatic bracket/double-quote pairs, smart indentation, comment toggling, active-line highlighting, and enclosing-collection selection.
+- Structural editing in both code editors: forward/backward slurp and barf, splice, and wrap with a compact Structure menu and keyboard shortcuts.
 - HTML and CSS editors across the top; ClojureScript and Result below.
 - Drag the central dividers to resize columns and rows. Focus a divider and use arrow keys (Shift for larger steps), Home/End for limits, or double-click to reset. On narrow screens, drag the handle below each pane to adjust its height.
 - Maximize any pane with its header button; click Restore or press Escape to return to your previous layout. Editor contents, undo history, divider positions, and running preview state are retained. Escape also works inside Result.
@@ -46,6 +47,8 @@ A synchronous infinite loop can block the browser thread. Reload or close the ta
 - `dist/repl-core.js`: persistent sandboxed REPL session and top-level expression boundaries.
 - `dist/repl.js`: REPL editor, terminal, prompt history, and mode switching.
 - `tests/repl.cjs`: runtime, session lifecycle, and expression-boundary checks (`npm test`).
+- `dist/structural-editing.js`: reader-form boundaries, structural transformations, shortcuts, and the Structure menu.
+- `tests/structural-editing.cjs`: structural editing, reader edge cases, cursor/selection, and editor integration checks.
 - `dist/pane-maximize.js`: pane maximize/restore controls and keyboard handling.
 - `dist/vendor/`: locally bundled runtime, editors, and dependency licenses.
 - `package.json` / `package-lock.json`: exact dependency versions.
@@ -73,13 +76,30 @@ Bundled third-party dependencies retain their own licenses: CodeMirror is MIT-li
 | Ctrl/Cmd+Shift+I | Reindent the selection; when nothing is selected, reindent the whole editor. |
 | Alt/Option+Up | Select the enclosing list, vector, or map. Repeat to expand outward. |
 | Alt/Option+Down | Restore the previous selection from expansion history. |
-| Ctrl/Cmd+Enter | Run the fiddle. |
+| Ctrl/Cmd+Enter | Run the fiddle, or run the file in REPL mode. |
+| Ctrl/Cmd+Alt/Option+Right / Left | Slurp the next / previous form into the enclosing collection. |
+| Ctrl/Cmd+Alt/Option+Shift+Right / Left | Barf the last / first form out of the enclosing collection. |
+| Ctrl/Cmd+Alt/Option+S | Splice the enclosing collection (remove its brackets). |
+| Ctrl/Cmd+Alt/Option+P / V / M | Wrap the current form or complete selected forms in a list / vector / map. |
 
 Shrink requires a previous Expand operation; it does not undo arbitrary manual selections.
 
 Typing an opening bracket or double quote inserts its partner; typing a closing bracket skips over an existing partner. Backspace between an empty pair removes both. Typing an opening bracket with text selected wraps the selection. Single quotes remain Clojure reader quotes and are not paired.
 
 Collection selection ignores delimiters inside strings, regex literals, comments, and character literals; it includes the `#` prefix for sets and anonymous functions. It selects balanced bracketed collections, not arbitrary reader forms or a full structural-editing AST. Moving the cursor or changing code clears the selection-expansion history. Reindentation changes leading whitespace, not general code formatting.
+
+### Structural editing
+
+Use **Structure** in the Fiddle or REPL ClojureScript pane. It exposes the same commands as the shortcuts above, including when an operating system intercepts a shortcut. Escape closes the command list. Commands operate on one cursor or selection; ordinary typing and deletion remain unchanged.
+
+- **Slurp** pulls an adjacent form into a collection: `(a) b` → `(a b)`.
+- **Barf** pushes a form outside: `(a b)` → `(a) b` (forward) or `a (b)` (backward).
+- **Splice** removes the enclosing delimiters: `(a [b c])` → `(a b c)` with the cursor inside the vector.
+- **Wrap** encloses the form at the cursor, or selected complete adjacent forms. Select `:name "Ada"` and choose Wrap in `{ }` to create a map. Partial tokens cannot be wrapped by a structural command.
+
+Maps slurp/barf whole key/value pairs. Reader prefixes such as quote, metadata, tagged literals, sets, anonymous functions, and namespaced maps stay attached when forms move. Comments, strings, regexes, and character literals are recognized; commands invoked inside literal text or comments leave the code unchanged. Each successful command is one undo step. Existing whitespace is retained where possible; use Reindent when needed.
+
+This is conservative reader-form editing, not a full compiler or a semantic refactoring tool. Commands leave incomplete/mismatched code, unsupported reader syntax, nested discard prefixes, and edits that produce an odd map arity unchanged, with a status message. Splicing a quote/metadata/tag-prefixed collection is also refused. Reader conditional shells are left intact; edit forms inside their branches. Balanced edits can still change program meaning, as expected when moving forms.
 
 The editing helpers live in `dist/clojure-editing.js`. CodeMirror add-ons are bundled in `dist/vendor/` under CodeMirror's existing MIT license.
 

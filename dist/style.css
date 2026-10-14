@@ -157,6 +157,19 @@ textarea { width: 100%; flex: 1; border: 0; padding: 15px; background: var(--pan
 .editing-guide { display: grid; gap: 5px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #45543b; }
 .editing-guide kbd { display: inline; margin-left: 0; color: #d5e5cc; background: #ffffff08; border-color: #607454; }
 
+/* Structural commands stay within their pane, including when maximized. */
+.structure-menu { margin-left: auto; flex-shrink: 0; }
+.structure-menu summary { cursor: pointer; padding: 4px 7px; border-radius: 5px; color: var(--muted); font-size: 12px; }
+.structure-menu summary:hover, .structure-menu[open] summary { color: var(--accent); background: #b3e57712; }
+.structure-menu summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.structure-commands { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 2px 6px; padding: 8px; border-bottom: 1px solid var(--edge); background: var(--raised); flex: 0 0 auto; max-height: 180px; overflow: auto; }
+.structure-commands button { justify-content: flex-start; min-height: 29px; padding: 4px 8px; font-size: 12px; }
+.structure-commands p { grid-column: 1 / -1; margin: 5px 8px; color: var(--muted); font-size: 11px; }
+.structure-status { padding: 5px 12px; color: var(--accent); font-size: 12px; flex-shrink: 0; max-height: 48px; overflow: auto; }
+.structure-status:empty { display: none; }
+.code-panel .panel-head, .repl-code-panel .panel-head { flex-wrap: wrap; height: auto; min-height: 45px; gap: 4px 8px; padding-block: 6px; }
+.code-panel .panel-head > div, .repl-code-panel .panel-head > div { min-height: 30px; }
+
 /* A persistent REPL session, alongside the existing four-pane fiddle. */
 .mode-toggle { display: flex; padding: 3px; gap: 2px; border: 1px solid var(--edge); border-radius: 8px; background: var(--bg); }
 .mode-toggle button { min-height: 30px; padding: 4px 11px; font-size: 13px; }
