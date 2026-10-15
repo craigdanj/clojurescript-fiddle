@@ -63,7 +63,7 @@ main { display: flex; flex-direction: column; flex: 1 0 auto; min-height: 0; wid
 .CodeMirror-focused .CodeMirror-selected { background: #3b4d64 !important; }
 .cm-s-default .cm-comment { color: #95a1b3; font-style: italic; }
 .cm-s-default .cm-keyword, .cm-s-default .cm-builtin { color: #ffaf8f; }
-:is(.code-panel, .repl-code-panel) .cm-s-default :is(.cm-keyword, .cm-builtin) { color: #b9de8d; }
+:is(.code-panel, .repl-code-panel) .cm-s-default :is(.cm-keyword, .cm-builtin) { color: #50d3ff; }
 .cm-s-default .cm-string { color: #e6c28e; }
 .cm-s-default .cm-number, .cm-s-default .cm-atom { color: #d1b5ec; }
 .cm-s-default .cm-def, .cm-s-default .cm-tag { color: #a6c8de; }
