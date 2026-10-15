@@ -58,12 +58,12 @@ main { display: flex; flex-direction: column; flex: 1 0 auto; min-height: 0; wid
 .CodeMirror { flex: 1; min-height: 0; height: auto; padding: 10px 0; background: var(--panel); color: #dae2ef; font: 14px/1.75 var(--mono); }
 .CodeMirror-gutters { background: var(--panel); border-right: 1px solid #ffffff05; }
 .CodeMirror-linenumber { min-width: 24px; padding: 0 14px 0 8px; color: #8995a8; }
-.CodeMirror-cursor { border-left: 2px solid var(--accent); }
+.CodeMirror-cursor { border-left: 2px solid #f5f5f5; }
 .CodeMirror-selected { background: #334157 !important; }
 .CodeMirror-focused .CodeMirror-selected { background: #3b4d64 !important; }
 .cm-s-default .cm-comment { color: #95a1b3; font-style: italic; }
 .cm-s-default .cm-keyword, .cm-s-default .cm-builtin { color: #ffaf8f; }
-:is(.code-panel, .repl-code-panel) .cm-s-default :is(.cm-keyword, .cm-builtin) { color: #50d3ff; }
+:is(.code-panel, .repl-code-panel) .cm-s-default :is(.cm-keyword, .cm-builtin) { color: #40E0D0; }
 .cm-s-default .cm-string { color: #e6c28e; }
 .cm-s-default .cm-number, .cm-s-default .cm-atom { color: #d1b5ec; }
 .cm-s-default .cm-def, .cm-s-default .cm-tag { color: #a6c8de; }
