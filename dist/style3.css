@@ -72,10 +72,10 @@ main { display: flex; flex-direction: column; flex: 1 0 auto; min-height: 0; wid
 .editor-foot, .preview-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 27px; flex-shrink: 0; padding: 0 13px; border-top: 1px solid #252c36; background: var(--surface-inset); color: var(--muted); font: 12px var(--mono); }
 #preview { flex: 1; min-height: 0; background: #f3f6fb; }
 #preview iframe { display: block; width: 100%; height: 100%; border: 0; background: white; }
-.preview-empty { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: #506079; text-align: center; padding: 20px; }
+.preview-empty { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: flex-start; overflow: auto; color: #506079; text-align: center; padding: 20px; }
 .preview-empty > span { font-size: 48px; line-height: 1.2; color: #b8502c; }
-.preview-empty strong { font-size: 17px; font-weight: 500; }
-.preview-empty p { font-size: 14px; }
+.preview-empty strong { font-size: 17px; }
+.preview-empty p { max-width: 400px; margin: 10px 0 0; font-size: 14px; line-height: 1.7; }
 .console-panel { display: block; flex: 0 0 auto; min-height: 0; border-top: 1px solid var(--edge); background: #11151c; }
 .console-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 39px; padding: 8px 14px; cursor: pointer; background: var(--surface-head); list-style: none; font-weight: 500; }
 .console-panel summary:hover { background: #222934; }
@@ -241,6 +241,13 @@ header { position: relative; z-index: 5; }
 #eval-expression:hover, #repl-send:hover { background: #ff7f5026; }
 ::selection { background: #ff7f5038; color: #fff2e9; }
 
+.preview-empty .welcome-tip { color: #657389; font-size: 12px; }
+.preview-empty kbd { display: inline; margin-left: 0; white-space: nowrap; }
+
+.preview-empty > * { flex-shrink: 0; }
+.preview-empty > :first-child { margin-top: auto; }
+.preview-empty > :last-child { margin-bottom: auto; }
+
 /* ===== Visual refresh =====
    Flatter surfaces, coral reserved for Run and the active state, one language-colored
    edge on the focused pane. Selectors and markup are unchanged. */
@@ -287,8 +294,6 @@ textarea { font-size: 13.5px; line-height: 1.7; }
 .editor-foot, .preview-foot { border-top-color: var(--edge); }
 
 #preview { background-color: #f4f6f9; background-image: radial-gradient(#d3d9e2 1px, transparent 1px); background-size: 18px 18px; }
-.preview-empty strong { color: #2b3647; font-weight: 600; }
-.preview-empty p { color: #5d6a7e; margin: 4px 0 0; }
 .console-panel { background: var(--surface-inset); border-top-color: var(--edge); }
 .console-panel summary { background: var(--surface-head); }
 .console-panel summary:hover { background: var(--raised); }
@@ -307,3 +312,11 @@ textarea { font-size: 13.5px; line-height: 1.7; }
 .splitter::after { background: #3a4656; }
 * { scrollbar-color: #3a4656 transparent; }
 ::selection { background: #ff7f5033; }
+
+/* Welcome message: one centered reading column in the preview.
+   The last paragraph is a separate aside, so it gets a divider instead of a label. */
+.preview-empty > * { width: min(100%, 380px); }
+.preview-empty > span { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 16px; font-size: 26px; line-height: 1; color: #b8502c; background: #ff7f5020; border: 1px solid #ff7f5050; border-radius: 12px; }
+.preview-empty p { max-width: none; margin: 10px 0 0; font-size: 14px; line-height: 1.65; text-wrap: pretty; }
+.preview-empty kbd { padding: 1px 6px; font: 600 11.5px/1.5 var(--mono); color: #394557; background: #fff; border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 5px; }
+.preview-empty .welcome-tip { margin-top: 18px; padding-top: 14px; border-top: 1px solid #d3d9e2; color: #5d6a7e; font-size: 12.5px; }
