@@ -1,10 +1,10 @@
 # ClojureScript Fiddle
 
-A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open the page, edit the code, and press **Run** or **Ctrl/Cmd + Enter**. The initial Fiddle counter runs automatically. Use the Fiddle / REPL toggle in the header to change editor mode.
+A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open the page, edit the code, and press **Run** or **Ctrl/Cmd + Enter**. Fiddle opens with blank HTML, CSS, and ClojureScript editors and a welcome message in Result. Choose Load example to load and run a starter project, or write your own code. Use the Fiddle / REPL toggle in the header to change editor mode.
 
 ## Features
 
-- Download and import named projects from the Project menu in either mode. One portable file keeps all four code buffers and the active mode; Undo import restores the previous code.
+- Export and import named projects from the Project menu in either mode. One portable file keeps all four code buffers and the active mode; Undo import restores the previous code.
 - ClojureScript, HTML, and CSS editors with syntax highlighting and line numbers.
 - ClojureScript bracket matching, automatic bracket/double-quote pairs, smart indentation, comment toggling, active-line highlighting, and enclosing-collection selection.
 - Structural editing in both code editors: forward/backward slurp and barf, splice, and wrap with a compact Structure menu and keyboard shortcuts.
@@ -16,7 +16,7 @@ A JSFiddle-style, browser-only playground for ClojureScript, HTML, and CSS. Open
 - Console captures `println`, `prn`, JavaScript console output, the final expression, errors, and async failures.
 - Each Fiddle Run creates a fresh interpreter, document, and state; REPL evaluations share a persistent interpreter until Restart session.
 - Run discards the previous preview and its asynchronous callbacks before starting fresh. Clear clears the console only.
-- Counter, sequences/maps, and color examples. Reset restores the selected example.
+- Load example dropdown with counter, sequences/maps, and color examples. Every selection loads and runs a fresh copy, including selecting the current example again.
 - Blue-gray theme with coral (`#FF7F50`) accents, readable syntax colors, responsive layout, and accessible button labels.
 - Runtime and editor assets are bundled locally. No CDN or code execution server is needed.
 
@@ -34,7 +34,7 @@ Then open http://localhost:8080. Static hosting is only for downloading files; a
 
 Uses **Scittle 0.8.33 / SCI**, an interpreter for a substantial ClojureScript subset, rather than the complete ClojureScript compiler. Supports core data structures and functions, atoms, functions, common namespaces such as `clojure.string`, and JavaScript / DOM interop. Full compiler features, arbitrary Maven/npm dependencies, and externally loaded macro libraries are not included. There is no generated-JavaScript pane because execution is interpreted.
 
-HTML is inserted into the preview document. Write behavior in the ClojureScript panel; scripts embedded in the HTML panel are not executed. Run does not persist edits. Selecting an example or Reset replaces current edits.
+HTML is inserted into the preview document. Write behavior in the ClojureScript panel; scripts embedded in the HTML panel are not executed. Run does not persist edits. Choosing Load example → an example replaces all current Fiddle HTML, CSS, and ClojureScript edits and runs the fresh example. Re-select the same example to reset it; the REPL buffer is unaffected.
 
 The iframe has `sandbox="allow-scripts"` without same-origin access. Preview code cannot access the parent page's DOM or storage. The console accepts messages only from the active iframe with its per-run identifier. User code can still make browser network requests where permitted. This is a convenience playground, not a security boundary for hostile code.
 
@@ -46,8 +46,11 @@ A synchronous infinite loop can block the browser thread. Reload or close the ta
 - `dist/style.css`: current coral-accent responsive workspace theme.
 - `dist/style2.css`: original blue-gray and green-accent stylesheet. To use it, change the stylesheet link in `dist/index.html` from `style.css` to `style2.css`.
 - `dist/app.js`: editors, examples, preview lifecycle, execution, and console.
+- `dist/example-menu.js` / `dist/example-menu.css`: accessible Load example dropdown and repeatable fresh example loading.
 - `dist/project-files.js`: versioned project format, validation, serialization, and import/undo controller.
-- `dist/projects.js`: Project menu, browser file download/import, and workspace restoration.
+- `dist/projects.js`: Project menu, JSON export/import, HTML downloads, and workspace restoration.
+- `dist/standalone-html.js`: self-contained HTML builder, runtime embedding, and startup.
+- `tests/standalone-html.cjs`: runtime execution, interactions, escaping, and error diagnostics for exported pages.
 - `tests/projects.cjs`: round trips, invalid-file handling, file controls, and undo checks.
 - `dist/repl-core.js`: persistent sandboxed REPL session and top-level expression boundaries.
 - `dist/repl.js`: REPL editor, terminal, prompt history, and mode switching.
@@ -117,15 +120,15 @@ Use the **Fiddle / REPL** toggle in the header. Fiddle keeps the existing four r
 - Type directly at the terminal prompt and press **Enter** to evaluate. **Shift+Enter** inserts a new line. Up at the beginning and Down at the end of the input recall submitted commands.
 - Definitions, functions, atoms, and the current namespace persist between evaluations. Errors are printed; subsequent evaluations can continue.
 - **Clear** removes terminal output only. **Restart session** discards the REPL interpreter and its definitions, timers, and queued work, while preserving the editor and input history.
-- Fiddle and REPL retain separate code buffers and execution environments while switching modes. REPL starts with a data/functions example and does not load the Fiddle HTML or CSS. Neither buffer is automatically saved across a page reload. Use Project → Download project to keep your work.
+- Fiddle and REPL retain separate code buffers and execution environments while switching modes. REPL starts with a data/functions example and does not load the Fiddle HTML or CSS. Neither buffer is automatically saved across a page reload. Use Project → Export JSON to keep your work.
 - The REPL retains the same Clojure editing shortcuts. It is a ClojureScript terminal, not an operating-system shell or a full terminal/ANSI emulator.
 
 The runtime is a persistent sandboxed iframe using bundled Scittle, entirely client-side. Evaluation requests are processed in order. Terminal output is capped at 1,000 rows and 20,000 characters per row; at most 100 submitted transcript groups and 100 input-history entries are retained. As in Fiddle, a synchronous infinite loop can block the browser thread; session restart cannot interrupt it while the thread is blocked.
 
 
-## Download and import projects
+## Export and import projects
 
-Open **Project** in the header (available in both modes), enter a name, and choose **Download project**. Your browser downloads a `.cljsfiddle.json` file. Choose **Import project** to reopen it from your computer; you can import from either mode.
+Open **Project** in the header (available in both modes), enter a name, and choose **Export JSON**. Your browser downloads a `.cljsfiddle.json` file. Choose **Import JSON** to reopen it from your computer; you can import from either mode.
 
 Every project contains:
 
@@ -137,4 +140,15 @@ Import replaces **both** modes' code and switches to the saved mode. The current
 
 Project files contain source code only. They do not capture console/terminal output, terminal command history, live definitions or atoms, pending terminal input, pane dimensions, or external dependencies. Files are read and downloaded locally in the browser; there is no project-upload server.
 
-The versioned JSON format uses `format: "clojurescript-fiddle"`, `version: 1`, `name`, `mode` (`"fiddle"` or `"repl"`), and a `files` object containing all four filenames above as text values. Empty code is supported. Import validates the complete document before replacing editors; malformed files, unsupported versions, missing/non-text code fields, and files over 5 MiB are rejected. Download enforces the same size limit. The download is a project document for this editor, not a standalone website or a ZIP of the playground application.
+The versioned JSON format uses `format: "clojurescript-fiddle"`, `version: 1`, `name`, `mode` (`"fiddle"` or `"repl"`), and a `files` object containing all four filenames above as text values. Empty code is supported. Import validates the complete document before replacing editors; malformed files, unsupported versions, missing/non-text code fields, and files over 5 MiB are rejected. JSON export enforces the same size limit. JSON is the editable project document; use Download runnable HTML for a runnable page.
+
+
+## Download runnable HTML
+
+In **Fiddle mode**, open **Project → Download runnable HTML**. The downloaded `.html` file contains the current Fiddle HTML, CSS, ClojureScript, and bundled Scittle runtime, including its license and source attribution. The export captures the editor buffers when you click Download; you do not need to Run first. Creating the file does not evaluate your code.
+
+Open the resulting file directly in a browser, including with `file://`, or put it on static hosting. It starts the Fiddle automatically with no CDN, server, build step, or runtime download. User-supplied external images, fonts, stylesheets, URLs, and network calls still need their own resources; they are not embedded automatically. Relative URLs resolve against the downloaded file or its hosting location.
+
+The standalone page has no editor or playground controls. `println` and `prn` write to the browser developer console; runtime errors also display on the page. As in the preview, script tags inserted through the HTML buffer do not execute; put behavior in the ClojureScript buffer. The file is a regular browser page and executes outside the playground's sandbox.
+
+HTML downloads use the three Fiddle buffers only and are disabled in REPL mode. Use **Export JSON** / **Import JSON** in either mode to save and reopen all four buffers. Runnable HTML is an output artifact, not an importable project document.

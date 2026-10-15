@@ -4,7 +4,7 @@
   "description": "Browser-only ClojureScript, HTML, and CSS playground",
   "main": "index.js",
   "scripts": {
-    "check": "node --check dist/app.js && node --check dist/clojure-editing.js && node --check dist/structural-editing.js && node --check dist/pane-maximize.js && node --check dist/repl-core.js && node --check dist/repl.js && node --check dist/project-files.js && node --check dist/projects.js",
+    "check": "node --check dist/app.js && node --check dist/example-menu.js && node --check dist/clojure-editing.js && node --check dist/structural-editing.js && node --check dist/pane-maximize.js && node --check dist/repl-core.js && node --check dist/repl.js && node --check dist/project-files.js && node --check dist/projects.js && node --check dist/standalone-html.js",
     "test": "node --test tests/*.cjs"
   },
   "keywords": [],

@@ -69,10 +69,10 @@ main { display: flex; flex-direction: column; flex: 1 0 auto; min-height: 0; wid
 .editor-foot, .preview-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 27px; flex-shrink: 0; padding: 0 13px; border-top: 1px solid #252c36; background: var(--surface-inset); color: var(--muted); font: 12px var(--mono); }
 #preview { flex: 1; min-height: 0; background: #f3f6fb; }
 #preview iframe { display: block; width: 100%; height: 100%; border: 0; background: white; }
-.preview-empty { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: #506079; text-align: center; padding: 20px; }
+.preview-empty { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: flex-start; overflow: auto; color: #506079; text-align: center; padding: 20px; }
 .preview-empty > span { font-size: 48px; line-height: 1.2; color: #b8502c; }
 .preview-empty strong { font-size: 17px; font-weight: 500; }
-.preview-empty p { font-size: 14px; }
+.preview-empty p { max-width: 400px; margin: 10px 0 0; font-size: 14px; line-height: 1.7; }
 .console-panel { display: block; flex: 0 0 auto; min-height: 0; border-top: 1px solid var(--edge); background: #11151c; }
 .console-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 39px; padding: 8px 14px; cursor: pointer; background: var(--surface-head); list-style: none; font-weight: 500; }
 .console-panel summary:hover { background: #222934; }
@@ -237,3 +237,10 @@ header { position: relative; z-index: 5; }
 #eval-expression, #repl-send { color: var(--accent); }
 #eval-expression:hover, #repl-send:hover { background: #ff7f5026; }
 ::selection { background: #ff7f5038; color: #fff2e9; }
+
+.preview-empty .welcome-tip { color: #657389; font-size: 12px; }
+.preview-empty kbd { display: inline; margin-left: 0; white-space: nowrap; }
+
+.preview-empty > * { flex-shrink: 0; }
+.preview-empty > :first-child { margin-top: auto; }
+.preview-empty > :last-child { margin-bottom: auto; }

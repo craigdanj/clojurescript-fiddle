@@ -56,12 +56,14 @@ test('project controls download, import, reject bad files, and undo without eval
  const editors=Object.fromEntries([['html','index.html'],['css','style.css'],['cljs','main.cljs']].map(([key,file]) => [key,{value:current.files[file],getValue(){return this.value;},setValue(value){this.value=value;},clearHistory(){},refresh(){}}]));
  let mode='repl',repl=current.files['repl.cljs'];
  const ReplUI={isActive:()=>mode==='repl',getCode:()=>repl,loadCode:value=>{repl=value;calls.repl++;},switchMode:value=>mode=value,refresh(){}};
- const context={document,window:{ReplUI},editors,FiddleProjects:Projects,Event,Blob,URL:{createObjectURL:blob=>{blobs.push(blob);return 'blob:test';},revokeObjectURL:url=>revoked.push(url)},setTimeout:fn=>fn(),requestAnimationFrame:fn=>fn(),clearPreview:()=>calls.preview++,clearConsole:()=>calls.console++,status() {}};
+ let resolveRuntime,failRuntime=false;
+ const context={document,window:{ReplUI},editors,FiddleProjects:Projects,FiddleHTML:require('../dist/standalone-html.js'),loadRuntime:()=>failRuntime?Promise.reject(Error('Runtime unavailable')):new Promise(resolve=>resolveRuntime=resolve),fetch:async()=>({ok:true,text:async()=>'EPL test license'}),Event,Blob,URL:{createObjectURL:blob=>{blobs.push(blob);return 'blob:test';},revokeObjectURL:url=>revoked.push(url)},setTimeout:fn=>fn(),requestAnimationFrame:fn=>fn(),clearPreview:()=>calls.preview++,clearConsole:()=>calls.console++,status() {}};
  get('project-name').value=current.name;
  vm.runInNewContext(fs.readFileSync(require.resolve('../dist/projects.js'),'utf8'),context);
- get('project-download').click();
+ get('project-export').click();
  assert.deepEqual(Projects.parse(await blobs[0].text()),current);
  assert.equal(created.find(e=>e.tag==='a').download,Projects.filename(current.name));assert.deepEqual(revoked,['blob:test']);
+ assert.equal(get('project-download').disabled,true);get('project-download').click();assert.equal(blobs.length,1);
  const imported=sample('fiddle');imported.name='Reopened';imported.files['main.cljs']='(println "imported")';
  async function upload(text,size=text.length) {
   get('project-file').files=[{size,text:async()=>text}];
@@ -71,6 +73,16 @@ test('project controls download, import, reject bad files, and undo without eval
  await upload(Projects.serialize(imported));
  assert.equal(mode,'fiddle');assert.equal(editors.cljs.value,imported.files['main.cljs']);assert.equal(get('project-name').value,'Reopened');
  assert.equal(get('project-undo').hidden,false);assert.equal(get('project-file').value,'');assert.equal(get('project-import').disabled,false);
+ assert.deepEqual(calls,{preview:1,console:1,repl:1});
+ document.dispatchEvent(new Event('editor-mode-change'));assert.equal(get('project-download').disabled,false);
+ get('project-download').click();assert.equal(get('project-download').disabled,true);
+ editors.cljs.value='Changed while preparing download';resolveRuntime('/* bundled runtime */');
+ await new Promise(resolve=>setImmediate(resolve));
+ const html=await blobs[1].text();assert.equal(blobs[1].type,'text/html;charset=utf-8');
+ assert(html.includes(JSON.stringify(imported.files['main.cljs'])));assert(!html.includes('Changed while preparing download'));
+ assert.equal(created.filter(e=>e.tag==='a').at(-1).download,'reopened.html');assert.equal(get('project-download').disabled,false);
+ failRuntime=true;get('project-download').click();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(blobs.length,2);assert.equal(get('project-download').disabled,false);assert.match(get('project-message').textContent,/Runtime unavailable/);
  assert.deepEqual(calls,{preview:1,console:1,repl:1});
  await upload('{}');assert.equal(get('project-message').dataset.error,'true');assert.equal(calls.repl,1);
  await upload('',Projects.MAX_BYTES+1);assert.equal(calls.repl,1);assert.match(get('project-message').textContent,/5 MB/);

@@ -176,8 +176,6 @@ ExampleMenu.install({container:$('example-menu'),button:$('load-example'),list:$
 function toggleHelp(show) {$('guide').hidden=!show;$('help').setAttribute('aria-expanded',String(show));Object.values(editors).forEach(editor=>editor.refresh());window.ReplUI?.refresh();}
 $('help').addEventListener('click',()=>toggleHelp($('guide').hidden));$('close-guide').addEventListener('click',()=>toggleHelp(false));
 document.addEventListener('keydown',e=>{if(!e.defaultPrevented&&(e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});
-for(const key of Object.keys(editors))editors[key].setValue(examples.counter[key]);
-run();
 
 // Shared desktop dividers and individual height handles on stacked screens.
 (() => {
