@@ -80,6 +80,7 @@
   byId('mode-repl').setAttribute('aria-pressed',String(mode==='repl'));
   byId('run-label').textContent=mode==='repl'?'Run file':'Run';
   byId('run').title=mode==='repl'?'Evaluate the REPL file (Ctrl/Cmd+Enter)':'Run fiddle (Ctrl/Cmd+Enter)';
+  document.dispatchEvent(new Event('editor-mode-change'));
   requestAnimationFrame(()=>{
    if(mode==='repl'){editor.refresh();editor.focus();}
    else {Object.values(editors).forEach(cm=>cm.refresh());byId('workspace').dispatchEvent(new Event('pane-layout-change'));}

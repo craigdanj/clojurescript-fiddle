@@ -9,7 +9,7 @@
  const files = ['index.html','style.css','main.cljs','repl.cljs'];
  const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
  function validate(value) {
-  if (!object(value) || value.format !== FORMAT) throw Error('Choose a project downloaded from ClojureScript Fiddle (.cljsfiddle.json).');
+  if (!object(value) || value.format !== FORMAT) throw Error('Choose a project exported from ClojureScript Fiddle (.cljsfiddle.json).');
   if (value.version !== VERSION) throw Error('This project version is not supported. Expected version 1.');
   if (typeof value.name !== 'string' || !value.name.trim() || value.name.length > 120 || /[\u0000-\u001f\u007f]/.test(value.name)) throw Error('Project name must be 1–120 characters without control characters.');
   if (!['fiddle','repl'].includes(value.mode)) throw Error('Project mode must be fiddle or repl.');

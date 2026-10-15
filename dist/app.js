@@ -170,9 +170,9 @@ window.addEventListener('message',e=>{
  else if(kind==='restore-pane')document.dispatchEvent(new Event('restore-pane'));
  else if(['log','warn','error','info','result'].includes(kind))log(kind,values.map(String));
 });
-function loadExample(name) {clearPreview();for(const key of Object.keys(editors))editors[key].setValue(examples[name][key]);run();}
+function loadExample(name) {ExampleMenu.load(examples[name],editors,run);}
 $('run').addEventListener('click',run);$('clear').addEventListener('click',clearConsole);
-$('example').addEventListener('change',()=>loadExample($('example').value));$('reset').addEventListener('click',()=>loadExample($('example').value));
+ExampleMenu.install({container:$('example-menu'),button:$('load-example'),list:$('example-list'),onSelect:loadExample,document});
 function toggleHelp(show) {$('guide').hidden=!show;$('help').setAttribute('aria-expanded',String(show));Object.values(editors).forEach(editor=>editor.refresh());window.ReplUI?.refresh();}
 $('help').addEventListener('click',()=>toggleHelp($('guide').hidden));$('close-guide').addEventListener('click',()=>toggleHelp(false));
 document.addEventListener('keydown',e=>{if(!e.defaultPrevented&&(e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});

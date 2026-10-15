@@ -27,15 +27,38 @@
   }
  });
  function report(text,error = false) {message.textContent = text;message.dataset.error = String(error);}
- byId('project-download').addEventListener('click',() => {
+ function downloadFile(file,type) {
+  const blob=new Blob([file.text],{type}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=file.filename;document.body.append(link);
+  try {link.click();} finally {link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+ }
+ byId('project-export').addEventListener('click',() => {
   try {
    const file = controller.download();
-   const blob = new Blob([file.text],{type:'application/json;charset=utf-8'});
-   const url = URL.createObjectURL(blob), link = document.createElement('a');
-   link.href = url;link.download = file.filename;document.body.append(link);
-   try {link.click();} finally {link.remove();setTimeout(() => URL.revokeObjectURL(url),1000);}
-   report('Download started: '+file.filename);
+   downloadFile(file,'application/json;charset=utf-8');
+   report('JSON export started: '+file.filename);
   } catch (error) {report(error.message,true);}
+ });
+ const htmlButton=byId('project-download');let downloadingHTML=false;
+ function updateHTMLControl() {
+  htmlButton.disabled=downloadingHTML||window.ReplUI.isActive();
+  byId('project-html-hint').textContent=window.ReplUI.isActive()?'Switch to Fiddle to download a runnable HTML page.':'Download runnable HTML includes the Fiddle page, styles, code, and runtime.';
+ }
+ document.addEventListener('editor-mode-change',updateHTMLControl);
+ menu.addEventListener('toggle',updateHTMLControl);updateHTMLControl();
+ htmlButton.addEventListener('click',async()=>{
+  if(downloadingHTML||window.ReplUI.isActive())return;
+  // Capture at the click, before awaiting the runtime. Export never runs code.
+  const snapshot={name:name.value.trim()||'Untitled project',html:editors.html.getValue(),css:editors.css.getValue(),cljs:editors.cljs.getValue()};
+  downloadingHTML=true;updateHTMLControl();report('Preparing runnable HTML…');
+  try {
+   const [runtime,license]=await Promise.all([loadRuntime(),fetch('vendor/SCITTLE-LICENSE').then(response=>{if(!response.ok)throw Error('Could not load the runtime license. Try again.');return response.text();})]);
+   const text=FiddleHTML.build({...snapshot,runtime,license});
+   const filename=FiddleProjects.filename(snapshot.name).replace(/\.cljsfiddle\.json$/,'.html');
+   downloadFile({filename,text},'text/html;charset=utf-8');
+   report('HTML download started: '+filename+'. Open it directly in your browser.');
+  } catch(error) {report(error.message,true);}
+  finally {downloadingHTML=false;updateHTMLControl();}
  });
  importButton.addEventListener('click',() => {picker.value = '';picker.click();});
  let request = 0;
